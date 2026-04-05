@@ -1,5 +1,4 @@
 const root = document.documentElement;
-const mouseGlow = document.querySelector('.mouse-glow');
 const revealElements = document.querySelectorAll('.reveal');
 const tiltCards = document.querySelectorAll('.tilt-card');
 
@@ -45,3 +44,20 @@ if (!isTouchDevice) {
     });
   });
 }
+
+window.addEventListener('scroll', () => {
+  const scroll = window.scrollY;
+  document.querySelectorAll('.bg-orb').forEach((orb, i) => {
+    orb.style.transform = `translateY(${scroll * (0.05 + i * 0.02)}px)`;
+  });
+});
+
+document.querySelectorAll('.nav-links a').forEach((link) => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
