@@ -1,26 +1,67 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <title>Community System</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medal-DE | Community Platform</title>
+    <meta
+      name="description"
+      content="Medal-DE ist eine moderne deutsche GMod-RP-Community mit Fokus auf Qualität, Eigenentwicklung und klarer Vision für SCP-RP und CWRP."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="mouse-glow"></div>
+    <div class="bg-grid"></div>
+    <div class="bg-orb orb-blue"></div>
+    <div class="bg-orb orb-red"></div>
 
-<div id="login">
-  <h1>🔐 Login</h1>
-  <input id="user" placeholder="Username">
-  <input id="pass" type="password" placeholder="Passwort">
-  <button onclick="login()">Login</button>
-  <p id="error"></p>
-</div>
+    <header class="site-header">
+      <div class="container nav">
+        <a href="#home" class="brand">
+          <div class="brand-mark">M</div>
+          <div>
+            <div class="brand-title">MEDAL-DE</div>
+            <div class="brand-subtitle">Community Platform</div>
+          </div>
+        </a>
 
-<div id="app" style="display:none;">
-  <h1>🏠 Dashboard</h1>
-  <p id="welcome"></p>
-  <button onclick="logout()">Logout</button>
-</div>
+        <nav class="nav-links">
+          <a href="#home">Home</a>
+          <a href="#about">Über uns</a>
+          <a href="#modes">Bereiche</a>
+          <a href="#team">Team</a>
+          <a href="#partners">Partner</a>
+          <a href="#join">Join</a>
+        </nav>
 
-<script src="app.js"></script>
-</body>
+        <a class="nav-button" href="https://discord.com/invite/medal-de" target="_blank" rel="noreferrer">
+          Discord beitreten
+        </a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero section" id="home">
+        <div class="container hero-grid">
+          <div class="hero-content reveal">
+            <div class="eyebrow">MODERN COMMUNITY EXPERIENCE</div>
+            <h1>
+              Medal-DE baut eine
+              <span>moderne Community-Präsenz</span>
+              mit echtem Anspruch.
+            </h1>
+            <p class="hero-text">
+              Eine deutsche GMod-RP-Community mit Fokus auf Qualität, Eigenentwicklung
+              und einer klaren Vision für SCP-RP, CWRP und langfristigen Aufbau.
+            </p>
+
+            <div class="hero-actions">
+              <a class="button button-primary" href="https://discord.com/invite/medal-de" target="_blank" rel="noreferrer">Discord beitreten</a>
 </html>
