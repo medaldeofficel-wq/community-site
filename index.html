@@ -1,1152 +1,375 @@
 <!DOCTYPE html>
 <html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Medal-DE V3</title>
-  <meta name="description" content="Moderne Community Website für Medal-DE" />
-  <style>
-    :root {
-      --bg: #060a11;
-      --bg-2: #0b1220;
-      --surface: rgba(10, 16, 28, 0.58);
-      --surface-strong: rgba(9, 14, 24, 0.8);
-      --border: rgba(255, 255, 255, 0.08);
-      --text: #f4f7fb;
-      --muted: rgba(244, 247, 251, 0.68);
-      --red: 255, 77, 77;
-      --blue: 70, 160, 255;
-      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-      --radius-xl: 32px;
-      --radius-lg: 24px;
-      --radius-md: 18px;
-      --container: 1220px;
-      --nav-height: 84px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 18% 22%, rgba(var(--red), 0.12), transparent 0 26%),
-        radial-gradient(circle at 82% 18%, rgba(var(--blue), 0.14), transparent 0 28%),
-        radial-gradient(circle at 55% 74%, rgba(120, 0, 255, 0.08), transparent 0 24%),
-        linear-gradient(180deg, #04070d 0%, #09111c 45%, #04070d 100%);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(80, 120, 255, 0.055) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(80, 120, 255, 0.045) 1px, transparent 1px);
-      background-size: 64px 64px;
-      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.25));
-      pointer-events: none;
-      opacity: 0.3;
-      z-index: -4;
-    }
-
-    .ambient-layer {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: -3;
-      overflow: hidden;
-    }
-
-    .ambient-layer::before,
-    .ambient-layer::after {
-      content: "";
-      position: absolute;
-      width: 42vw;
-      height: 42vw;
-      filter: blur(90px);
-      border-radius: 50%;
-      opacity: 0.26;
-      animation: drift 16s ease-in-out infinite alternate;
-    }
-
-    .ambient-layer::before {
-      top: -8%;
-      left: -10%;
-      background: rgba(var(--red), 0.38);
-    }
-
-    .ambient-layer::after {
-      right: -6%;
-      top: 8%;
-      animation-delay: -6s;
-      background: rgba(var(--blue), 0.34);
-    }
-
-    @keyframes drift {
-      0% { transform: translate3d(0, 0, 0) scale(1); }
-      100% { transform: translate3d(4vw, 3vh, 0) scale(1.08); }
-    }
-
-    .mouse-glow {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: -2;
-      background:
-        radial-gradient(circle 220px at var(--mx, 50%) var(--my, 50%), rgba(var(--blue), 0.11), transparent 60%),
-        radial-gradient(circle 160px at calc(var(--mx, 50%) - 3%) calc(var(--my, 50%) + 1%), rgba(var(--red), 0.09), transparent 62%);
-      transition: background-position 0.15s linear;
-    }
-
-    #trail-canvas,
-    #particles-canvas {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-
-    #particles-canvas { z-index: -2; }
-    #trail-canvas { z-index: -1; }
-
-    .site-shell {
-      position: relative;
-      z-index: 1;
-    }
-
-    .container {
-      width: min(calc(100% - 40px), var(--container));
-      margin: 0 auto;
-    }
-
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 20;
-      transition: transform 0.35s ease, background 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
-      border-bottom: 1px solid transparent;
-    }
-
-    .navbar.hidden {
-      transform: translateY(-110%);
-    }
-
-    .navbar.scrolled {
-      background: rgba(8, 12, 20, 0.72);
-      backdrop-filter: blur(16px);
-      border-color: rgba(255, 255, 255, 0.07);
-      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.25);
-    }
-
-    .nav-inner {
-      min-height: var(--nav-height);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      text-decoration: none;
-      color: var(--text);
-      min-width: 0;
-    }
-
-    .brand-logo {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      background: linear-gradient(135deg, rgba(var(--red), 0.2), rgba(var(--blue), 0.2));
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 30px rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(10px);
-      flex-shrink: 0;
-    }
-
-    .brand-copy {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    .brand-copy strong {
-      font-size: 0.98rem;
-      line-height: 1;
-    }
-
-    .brand-copy span {
-      font-size: 0.78rem;
-      color: var(--muted);
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      margin-top: 4px;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .nav-links a {
-      color: rgba(255, 255, 255, 0.82);
-      text-decoration: none;
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-size: 0.92rem;
-      transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
-    }
-
-    .nav-links a:hover,
-    .nav-links a.active {
-      background: rgba(255, 255, 255, 0.06);
-      color: #fff;
-      transform: translateY(-1px);
-    }
-
-    .nav-cta {
-      padding: 11px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: linear-gradient(135deg, rgba(var(--red), 0.17), rgba(var(--blue), 0.17));
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    }
-
-    main {
-      padding-top: calc(var(--nav-height) + 18px);
-    }
-
-    section {
-      position: relative;
-    }
-
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      padding: 46px 0 70px;
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 0.9fr;
-      gap: 34px;
-      align-items: center;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      color: rgba(255, 255, 255, 0.86);
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      font-size: 0.74rem;
-    }
-
-    .eyebrow::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, rgba(var(--red), 1), rgba(var(--blue), 1));
-      box-shadow: 0 0 16px rgba(var(--blue), 0.7);
-    }
-
-    .hero h1 {
-      font-size: clamp(3rem, 7vw, 6.25rem);
-      line-height: 0.94;
-      margin: 22px 0 18px;
-      letter-spacing: -0.04em;
-      max-width: 11ch;
-    }
-
-    .hero p {
-      margin: 0;
-      max-width: 62ch;
-      font-size: clamp(1rem, 1.35vw, 1.15rem);
-      line-height: 1.75;
-      color: var(--muted);
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin-top: 28px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      min-height: 50px;
-      padding: 0 20px;
-      border-radius: 16px;
-      text-decoration: none;
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
-      backdrop-filter: blur(10px);
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, rgba(var(--red), 0.2), rgba(var(--blue), 0.2));
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 16px 40px rgba(0, 0, 0, 0.2);
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .hero-panel {
-      position: relative;
-      padding: 22px;
-      border-radius: var(--radius-xl);
-      background: linear-gradient(180deg, rgba(12, 18, 30, 0.72), rgba(8, 12, 22, 0.84));
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      backdrop-filter: blur(18px);
-    }
-
-    .hero-panel::before {
-      content: "";
-      position: absolute;
-      inset: auto -10% -35% auto;
-      width: 230px;
-      height: 230px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(var(--blue), 0.22), transparent 70%);
-      filter: blur(8px);
-    }
-
-    .panel-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .panel-top span {
-      color: rgba(255, 255, 255, 0.72);
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      font-size: 0.75rem;
-    }
-
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 12px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.86);
-    }
-
-    .status-pill::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #7bff9a;
-      box-shadow: 0 0 12px rgba(123, 255, 154, 0.8);
-    }
-
-    .mini-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .mini-card {
-      min-height: 124px;
-      padding: 18px;
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      overflow: hidden;
-    }
-
-    .mini-card strong {
-      font-size: clamp(1.35rem, 2vw, 2.2rem);
-      line-height: 0.96;
-      overflow-wrap: break-word;
-      word-break: break-word;
-    }
-
-    .mini-card span {
-      font-size: clamp(0.74rem, 0.92vw, 0.92rem);
-      line-height: 1.35;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.62);
-      max-width: 12ch;
-      overflow-wrap: break-word;
-      word-break: break-word;
-      hyphens: auto;
-    }
-
-    .mini-card.accent-red {
-      background: radial-gradient(circle at top left, rgba(var(--red), 0.12), transparent 70%), rgba(255,255,255,0.03);
-    }
-
-    .mini-card.accent-blue {
-      background: radial-gradient(circle at top right, rgba(var(--blue), 0.12), transparent 70%), rgba(255,255,255,0.03);
-    }
-
-    .section-block {
-      padding: 90px 0;
-    }
-
-    .section-head {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 18px;
-      margin-bottom: 26px;
-      flex-wrap: wrap;
-    }
-
-    .section-head h2 {
-      margin: 0;
-      font-size: clamp(2rem, 4vw, 3.25rem);
-      line-height: 0.98;
-      letter-spacing: -0.03em;
-    }
-
-    .section-head p {
-      margin: 0;
-      max-width: 58ch;
-      color: var(--muted);
-      line-height: 1.7;
-    }
-
-    .glass-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 18px;
-    }
-
-    .stat-card,
-    .feature-card,
-    .server-card,
-    .partner-card,
-    .cta-box {
-      background: linear-gradient(180deg, rgba(12, 18, 30, 0.65), rgba(9, 13, 22, 0.82));
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-    }
-
-    .stat-card {
-      min-height: 220px;
-      padding: 24px;
-      border-radius: 30px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .stat-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at 75% 25%, rgba(var(--blue), 0.08), transparent 34%),
-        radial-gradient(circle at 25% 75%, rgba(var(--red), 0.08), transparent 36%);
-      pointer-events: none;
-    }
-
-    .stat-card h3 {
-      margin: 0;
-      font-size: clamp(1.7rem, 2vw, 2.9rem);
-      line-height: 0.96;
-      letter-spacing: -0.04em;
-      overflow-wrap: break-word;
-      word-break: break-word;
-      position: relative;
-      z-index: 1;
-    }
-
-    .stat-card p {
-      margin: 0;
-      font-size: clamp(0.78rem, 0.92vw, 0.98rem);
-      line-height: 1.35;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.63);
-      max-width: 12ch;
-      overflow-wrap: break-word;
-      word-break: break-word;
-      hyphens: auto;
-      position: relative;
-      z-index: 1;
-    }
-
-    .features-grid,
-    .servers-grid,
-    .partners-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px;
-    }
-
-    .feature-card,
-    .server-card,
-    .partner-card {
-      padding: 24px;
-      border-radius: 28px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .feature-card::before,
-    .server-card::before,
-    .partner-card::before {
-      content: "";
-      position: absolute;
-      inset: auto -15% -25% auto;
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(var(--blue), 0.12), transparent 70%);
-      pointer-events: none;
-    }
-
-    .card-kicker {
-      display: inline-block;
-      margin-bottom: 14px;
-      color: rgba(255,255,255,0.58);
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      font-size: 0.74rem;
-    }
-
-    .feature-card h3,
-    .server-card h3,
-    .partner-card h3 {
-      margin: 0 0 12px;
-      font-size: 1.45rem;
-      line-height: 1.08;
-    }
-
-    .feature-card p,
-    .server-card p,
-    .partner-card p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.7;
-    }
-
-    .server-badges,
-    .partner-badges {
-      margin-top: 18px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .badge {
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.8);
-    }
-
-    .cta-wrap {
-      padding: 20px 0 110px;
-    }
-
-    .cta-box {
-      border-radius: 34px;
-      padding: 30px;
-      display: grid;
-      grid-template-columns: 1.3fr auto;
-      gap: 18px;
-      align-items: center;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .cta-box::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at 20% 20%, rgba(var(--red), 0.09), transparent 26%),
-        radial-gradient(circle at 80% 30%, rgba(var(--blue), 0.11), transparent 28%);
-      pointer-events: none;
-    }
-
-    .cta-box h3 {
-      margin: 0 0 10px;
-      font-size: clamp(1.75rem, 3.2vw, 2.8rem);
-      line-height: 1;
-      position: relative;
-      z-index: 1;
-    }
-
-    .cta-box p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.7;
-      position: relative;
-      z-index: 1;
-    }
-
-    footer {
-      padding: 0 0 30px;
-    }
-
-    .footer-inner {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-      color: rgba(255,255,255,0.54);
-      font-size: 0.92rem;
-      border-top: 1px solid rgba(255,255,255,0.06);
-      padding-top: 22px;
-    }
-
-    .reveal {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    @media (max-width: 1080px) {
-      .hero-grid,
-      .cta-box {
-        grid-template-columns: 1fr;
-      }
-
-      .glass-grid,
-      .features-grid,
-      .servers-grid,
-      .partners-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 760px) {
-      :root {
-        --nav-height: 76px;
-      }
-
-      .container {
-        width: min(calc(100% - 26px), var(--container));
-      }
-
-      .nav-inner {
-        align-items: flex-start;
-        padding: 14px 0;
-        flex-direction: column;
-      }
-
-      .nav-links {
-        width: 100%;
-        justify-content: flex-start;
-      }
-
-      .hero {
-        min-height: auto;
-        padding-top: 24px;
-      }
-
-      .mini-grid,
-      .glass-grid,
-      .features-grid,
-      .servers-grid,
-      .partners-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .stat-card {
-        min-height: 180px;
-        padding: 20px;
-      }
-
-      .section-block {
-        padding: 72px 0;
-      }
-
-      .cta-wrap {
-        padding-bottom: 84px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="ambient-layer"></div>
-  <div class="mouse-glow"></div>
-  <canvas id="particles-canvas"></canvas>
-  <canvas id="trail-canvas"></canvas>
-
-  <div class="site-shell">
-    <header class="navbar" id="navbar">
-      <div class="container nav-inner">
-        <a href="#top" class="brand">
-          <div class="brand-logo">M</div>
-          <div class="brand-copy">
-            <strong>Medal-DE</strong>
-            <span>Community Network</span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medal-DE | Community Platform</title>
+    <meta
+      name="description"
+      content="Medal-DE ist eine moderne deutsche Roleplay-Community mit Fokus auf Qualität, Struktur und Eigenentwicklung."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="mouse-glow"></div>
+    <div class="bg-grid"></div>
+    <div class="bg-orb orb-blue"></div>
+    <div class="bg-orb orb-red"></div>
+
+    <header class="site-header">
+      <div class="container nav">
+        <a href="#home" class="brand">
+          <img src="Medal.png" class="brand-logo" alt="Medal-DE Logo" />
+          <div>
+            <div class="brand-title">MEDAL-DE</div>
+            <div class="brand-subtitle">Community Platform</div>
           </div>
         </a>
 
         <nav class="nav-links">
+          <a href="#home">Home</a>
           <a href="#about">Über uns</a>
-          <a href="#features">Stärken</a>
-          <a href="#servers">Bereiche</a>
+          <a href="#modes">Bereiche</a>
+          <a href="#team">Team</a>
           <a href="#partners">Partner</a>
-          <a href="#contact" class="nav-cta">Discord</a>
+          <a href="#join">Join</a>
         </nav>
+
+        <a class="nav-button" href="https://discord.com/invite/medal-de" target="_blank" rel="noreferrer">
+          Discord beitreten
+        </a>
       </div>
     </header>
 
-    <main id="top">
-      <section class="hero">
+    <main>
+      <section class="hero section" id="home">
         <div class="container hero-grid">
-          <div class="reveal visible">
-            <div class="eyebrow">High-End Community Auftritt</div>
-            <h1>Medal-DE als moderne Community Plattform.</h1>
-            <p>
-              Eine klare, hochwertige und futuristische Hauptwebsite für die gesamte Medal-DE Community.
-              Neutral im Auftritt, stark in der Wirkung und mit modernen Effekten im LED-Rot-Blau Stil.
+          <div class="hero-content reveal">
+            <div class="eyebrow">MODERN ROLEPLAY COMMUNITY</div>
+            <h1>
+              Medal-DE steht für
+              <span>modernes Roleplay</span>
+              mit Anspruch.
+            </h1>
+            <p class="hero-text">
+              Als deutscher Ableger der internationalen Medal-Community verbinden wir
+              Struktur, Qualität und Eigenentwicklung zu einer Plattform, die sich
+              bewusst von gewöhnlichen Roleplay-Servern abhebt.
             </p>
 
             <div class="hero-actions">
-              <a href="#about" class="btn btn-primary">Mehr entdecken</a>
-              <a href="#contact" class="btn btn-secondary">Jetzt beitreten</a>
-            </div>
-          </div>
-
-          <div class="hero-panel reveal visible">
-            <div class="panel-top">
-              <span>Community Übersicht</span>
-              <div class="status-pill">Aktiv & im Ausbau</div>
+              <a class="button button-primary" href="https://discord.com/invite/medal-de" target="_blank" rel="noreferrer">
+                Discord beitreten
+              </a>
+              <a class="button button-secondary" href="#modes">Bereiche entdecken</a>
             </div>
 
-            <div class="mini-grid">
-              <div class="mini-card accent-blue">
+            <div class="stats">
+              <div class="stat-card tilt-card reveal-delay-1">
                 <strong>High-End</strong>
                 <span>Community-Auftritt</span>
               </div>
-              <div class="mini-card">
+              <div class="stat-card tilt-card reveal-delay-2">
                 <strong>2</strong>
                 <span>Core-Bereiche</span>
               </div>
-              <div class="mini-card accent-red">
+              <div class="stat-card tilt-card reveal-delay-3">
                 <strong>100%</strong>
                 <span>Eigenanspruch</span>
               </div>
-              <div class="mini-card">
+              <div class="stat-card tilt-card reveal-delay-4">
                 <strong>DE × FR</strong>
                 <span>Zusammenarbeit</span>
               </div>
             </div>
           </div>
+
+          <div class="hero-visual reveal">
+            <div class="visual-shell tilt-card">
+              <div class="visual-panel visual-core hero-logo-panel">
+                <span class="panel-label">Core Identity</span>
+                <div class="hero-logo-wrap">
+                  <img src="Medal.png" alt="Medal-DE Hauptlogo" class="hero-main-logo" />
+                </div>
+              </div>
+
+              <div class="visual-side">
+                <div class="visual-panel tilt-card">
+                  <span class="panel-label">Ausrichtung</span>
+                  <h3>Qualität. Struktur. Entwicklung.</h3>
+                  <p>
+                    Medal-DE ist auf langfristigen Aufbau, moderne Präsentation und
+                    hochwertiges Roleplay mit klarer Vision ausgelegt.
+                  </p>
+                </div>
+                <div class="visual-panel tilt-card">
+                  <span class="panel-label">Positioning</span>
+                  <h3>Serious. Modern. Premium.</h3>
+                  <p>
+                    Kein Standard-Look und kein kurzlebiges Projekt, sondern eine Community,
+                    die professionell auftritt und genauso wahrgenommen werden soll.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section class="section-block" id="about">
-        <div class="container">
-          <div class="section-head reveal">
-            <div>
-              <h2>Ein Auftritt für die ganze Community.</h2>
-            </div>
+      <section class="section" id="about">
+        <div class="container two-col">
+          <div class="section-heading reveal">
+            <div class="eyebrow">Über Medal-DE</div>
+            <h2>Eine Community, die von Anfang an hochwertig wirken soll.</h2>
             <p>
-              Der Hintergrund bleibt bewusst neutral und hochwertig, damit Medal-DE nicht nur für einzelne Bereiche,
-              sondern als vollständige Community stark und wiedererkennbar auftritt.
+              Medal-DE ist der deutsche Teil eines internationalen Community-Netzwerks mit
+              Ursprung in Frankreich. Unser Ziel ist es, eine strukturierte, hochwertige
+              und langfristig ausgelegte Roleplay-Plattform aufzubauen.
+            </p>
+            <p>
+              Unter der Leitung von Globax und Onix entsteht eine Community, die nicht
+              auf kurzfristigen Erfolg, sondern auf nachhaltige Entwicklung, klare
+              Organisation und professionelle Umsetzung setzt.
             </p>
           </div>
 
-          <div class="glass-grid">
-            <article class="stat-card reveal">
-              <h3>Klare Marke</h3>
-              <p>Medal-DE Präsenz</p>
+          <div class="info-grid">
+            <article class="info-card tilt-card reveal">
+              <span class="panel-label">Zusammenarbeit</span>
+              <h3>Medal-DE × Medal FR</h3>
+              <p>
+                Medal-DE arbeitet eng mit der französischen Medal-Community zusammen.
+                Dadurch profitieren wir von Erfahrung, Konzepten und einer klaren Vision,
+                während wir gleichzeitig eigene Ideen für den deutschen Raum umsetzen.
+              </p>
             </article>
-            <article class="stat-card reveal">
-              <h3>Modernes Design</h3>
-              <p>Dark-Tech Stil</p>
-            </article>
-            <article class="stat-card reveal">
-              <h3>Reaktive Effekte</h3>
-              <p>Mouse Trail & Glow</p>
-            </article>
-            <article class="stat-card reveal">
-              <h3>Saubere Struktur</h3>
-              <p>Klare Sections</p>
+
+            <article class="info-card tilt-card reveal">
+              <span class="panel-label">Anspruch</span>
+              <h3>Nicht nur online. Eindrucksvoll online.</h3>
+              <p>
+                Unser Anspruch geht über klassische Community-Projekte hinaus. Medal-DE
+                soll visuell, technisch und strukturell überzeugen und in jeder Hinsicht
+                professionell wirken.
+              </p>
             </article>
           </div>
         </div>
       </section>
 
-      <section class="section-block" id="features">
+      <section class="section" id="modes">
         <div class="container">
-          <div class="section-head reveal">
-            <div>
-              <h2>V3 Upgrades im Überblick.</h2>
-            </div>
+          <div class="section-heading reveal">
+            <div class="eyebrow">Bereiche</div>
+            <h2>Zwei Kernbereiche. Eine klare Qualitätslinie.</h2>
             <p>
-              Alle besprochenen Punkte sind direkt in die Struktur eingebaut: neuer neutraler Hintergrund,
-              LED-Schweif an der Maus, Scroll-Navbar und sauber überarbeitete Boxen.
+              Jeder Bereich verfolgt seinen eigenen Stil, seine eigene Atmosphäre und
+              denselben hohen Anspruch an Wirkung, Struktur und technische Umsetzung.
             </p>
           </div>
 
-          <div class="features-grid">
-            <article class="feature-card reveal">
-              <span class="card-kicker">Background</span>
-              <h3>Neutraler Dark-Tech Look</h3>
-              <p>Mit Partikeln, Glow-Layern, Grid-Struktur und einer ruhigen futuristischen Atmosphäre für die ganze Community.</p>
+          <div class="cards-grid modes-grid">
+            <article class="mode-card scp tilt-card reveal">
+              <img src="MedalDEnewLogo.png" class="mode-logo" alt="SCP Logo" />
+              <span class="panel-label">Core Mode</span>
+              <h3>SCP: Mythra Zone</h3>
+              <h4>Kontrolliertes Chaos. Hohe Immersion.</h4>
+              <p>
+                SCP: Mythra Zone ist unser großes SCP-RP-Projekt für den deutschen Raum.
+                Inspiriert von der französischen Vorlage, aber eigenständig angepasst und
+                weiterentwickelt, entsteht ein immersives Erlebnis mit Fokus auf Atmosphäre,
+                Tiefe und Qualität.
+              </p>
+              <a class="button button-secondary" href="#join">Mehr erfahren</a>
             </article>
-            <article class="feature-card reveal">
-              <span class="card-kicker">Interaction</span>
-              <h3>LED Mouse Trail</h3>
-              <p>Die Maus bekommt einen weichen Schweif mit Glow und Fade-Out statt nur einem simplen Lichtpunkt.</p>
-            </article>
-            <article class="feature-card reveal">
-              <span class="card-kicker">UX</span>
-              <h3>Intelligente Navbar</h3>
-              <p>Beim Runterscrollen verschwindet die Leiste, beim Hochscrollen kommt sie mit Blur und sauberer Animation zurück.</p>
+
+            <article class="mode-card cwrp tilt-card reveal">
+              <img src="mdecwrplogov1.2.png" class="mode-logo" alt="CWRP Logo" />
+              <span class="panel-label">Core Mode</span>
+              <h3>CWRP</h3>
+              <h4>Militärisches Roleplay mit Anspruch.</h4>
+              <p>
+                Mit unserem Clone Wars RP entwickeln wir ein vollständig eigenständiges
+                Projekt, das gezielt auf Struktur, Klarheit und technische Qualität ausgelegt ist.
+                Ziel ist ein langfristig stabiles Roleplay-Erlebnis mit klaren Rollen und
+                kontinuierlicher Weiterentwicklung.
+              </p>
+              <a class="button button-secondary" href="#join">Mehr erfahren</a>
             </article>
           </div>
         </div>
       </section>
 
-      <section class="section-block" id="servers">
+      <section class="section" id="why-us">
         <div class="container">
-          <div class="section-head reveal">
-            <div>
-              <h2>Bereiche & Qualität.</h2>
-            </div>
+          <div class="section-heading reveal">
+            <div class="eyebrow">Warum Medal-DE</div>
+            <h2>Gebaut für einen Auftritt, der sofort ernst genommen wird.</h2>
             <p>
-              Statt den Hintergrund thematisch zu überladen, werden einzelne Bereiche sauber über Karten, Logos,
-              Texte und Badges hervorgehoben.
+              Die Website und die Community sprechen dieselbe Sprache: hochwertige
+              Präsentation, klare Struktur und ein moderner Stil mit Wiedererkennungswert.
             </p>
           </div>
 
-          <div class="servers-grid">
-            <article class="server-card reveal">
-              <span class="card-kicker">Bereich 01</span>
-              <h3>SCP Roleplay</h3>
-              <p>Qualitätsfokus, klare Identität und Platz für eure eigene Präsentation mit passendem Branding und Details.</p>
-              <div class="server-badges">
-                <span class="badge">Struktur</span>
-                <span class="badge">Qualität</span>
-                <span class="badge">Eigenentwicklung</span>
-              </div>
+          <div class="cards-grid features-grid">
+            <article class="feature-card tilt-card reveal">
+              <span class="panel-label">01</span>
+              <h3>Qualität zuerst</h3>
+              <p>
+                Unsere Projekte werden nicht schnell, sondern sauber entwickelt. Jede
+                Entscheidung wird mit Blick auf langfristige Stabilität und ein hochwertiges
+                Gesamtbild getroffen.
+              </p>
             </article>
-            <article class="server-card reveal">
-              <span class="card-kicker">Bereich 02</span>
-              <h3>Clone Wars RP</h3>
-              <p>Ein eigener Bereich mit starker visueller Abgrenzung innerhalb derselben Hauptwebsite, ohne das Hauptdesign zu brechen.</p>
-              <div class="server-badges">
-                <span class="badge">Design</span>
-                <span class="badge">Lore</span>
-                <span class="badge">Community</span>
-              </div>
+
+            <article class="feature-card tilt-card reveal">
+              <span class="panel-label">02</span>
+              <h3>Eigene Entwicklung</h3>
+              <p>
+                Eigene Systeme, individuelle Anpassungen und technische Lösungen sind ein
+                zentraler Bestandteil unserer Community und sorgen für ein einzigartiges Erlebnis.
+              </p>
             </article>
-            <article class="server-card reveal">
-              <span class="card-kicker">Mehr als nur Server</span>
-              <h3>Community als Marke</h3>
-              <p>Die Website präsentiert Medal-DE als ganzes Netzwerk und nicht nur als Sammlung einzelner Spielmodi.</p>
-              <div class="server-badges">
-                <span class="badge">Netzwerk</span>
-                <span class="badge">Auftreten</span>
-                <span class="badge">Wiedererkennung</span>
-              </div>
+
+            <article class="feature-card tilt-card reveal">
+              <span class="panel-label">03</span>
+              <h3>Klare Struktur</h3>
+              <p>
+                Eine klare Leitung, definierte Rollen und organisierte Abläufe schaffen
+                eine stabile Grundlage für Wachstum und langfristigen Erfolg.
+              </p>
+            </article>
+
+            <article class="feature-card tilt-card reveal">
+              <span class="panel-label">04</span>
+              <h3>Starker Eindruck</h3>
+              <p>
+                Von der Website bis zu den Projekten verfolgen wir ein einheitliches Ziel:
+                eine moderne, professionelle und ernstzunehmende Community-Präsenz.
+              </p>
             </article>
           </div>
         </div>
       </section>
 
-      <section class="section-block" id="partners">
-        <div class="container">
-          <div class="section-head reveal">
-            <div>
-              <h2>Zusammenarbeit & Partner.</h2>
-            </div>
+      <section class="section" id="team">
+        <div class="container two-col">
+          <div class="section-heading reveal">
+            <div class="eyebrow">Team</div>
+            <h2>Leitung mit Richtung, Anspruch und Vision.</h2>
             <p>
-              Kooperationen wie DE × FR oder externe Partner können modern und hochwertig eingebunden werden,
-              ohne das Gesamtbild der Website zu stören.
+              Eine professionelle Community braucht klare Verantwortung, saubere Organisation
+              und Menschen, die den Anspruch konsequent nach außen und nach innen tragen.
             </p>
           </div>
 
-          <div class="partners-grid">
-            <article class="partner-card reveal">
-              <span class="card-kicker">Interne Verbindung</span>
-              <h3>Medal FR</h3>
-              <p>Die Zusammenarbeit mit dem französischen Strang stärkt die Community-Struktur und kann prominent dargestellt werden.</p>
-              <div class="partner-badges">
-                <span class="badge">DE × FR</span>
-                <span class="badge">Netzwerk</span>
-              </div>
+          <div class="cards-grid team-grid">
+            <article class="team-card tilt-card reveal">
+              <span class="panel-label">Direktion</span>
+              <h3>Globax</h3>
+              <p>
+                Verantwortlich für die strategische Ausrichtung und den Aufbau der
+                Community-Struktur innerhalb von Medal-DE.
+              </p>
             </article>
-            <article class="partner-card reveal">
-              <span class="card-kicker">Partner</span>
-              <h3>Yugen Naruto RP</h3>
-              <p>Partner erhalten eigene hochwertige Karten mit Platz für Logo, Beschreibung und Verlinkung.</p>
-              <div class="partner-badges">
-                <span class="badge">Partner</span>
-                <span class="badge">Präsenz</span>
-              </div>
-            </article>
-            <article class="partner-card reveal">
-              <span class="card-kicker">V3 Ziel</span>
-              <h3>Mehr Professionalität</h3>
-              <p>Die Seite wirkt wie eine echte High-End Community Website mit klarer UX, besserer Struktur und mehr Wow-Effekt.</p>
-              <div class="partner-badges">
-                <span class="badge">Modern</span>
-                <span class="badge">Premium</span>
-              </div>
+
+            <article class="team-card tilt-card reveal">
+              <span class="panel-label">Direktion</span>
+              <h3>Onix</h3>
+              <p>
+                Fokus auf Organisation, Umsetzung und Sicherstellung des qualitativen
+                Anspruchs in allen Bereichen der Community.
+              </p>
             </article>
           </div>
         </div>
       </section>
 
-      <section class="cta-wrap" id="contact">
+      <section class="section" id="join">
         <div class="container">
           <div class="cta-box reveal">
             <div>
-              <h3>Bereit für die finale Ausarbeitung?</h3>
+              <div class="eyebrow">Join Medal-DE</div>
+              <h2>Werde Teil von Medal-DE.</h2>
               <p>
-                Diese V3 ist die komplette Grundstruktur. Danach können direkt eure echten Logos, Farben,
-                Discord-Links, Partner und Bereichs-Sectionen sauber eingebaut werden.
+                Werde Teil einer modernen Roleplay-Community mit klarer Vision,
+                strukturierter Entwicklung und einem starken Fokus auf Qualität.
+                Ob als Spieler, Teammitglied oder Mitwirkender – bei Medal-DE kannst
+                du aktiv an einem wachsenden Projekt mitbauen.
               </p>
             </div>
-            <div>
-              <a href="#top" class="btn btn-primary">Zurück nach oben</a>
+
+            <div class="hero-actions">
+              <a class="button button-primary" href="https://discord.com/invite/medal-de" target="_blank" rel="noreferrer">
+                Jetzt Discord betreten
+              </a>
+              <a class="button button-secondary" href="#about">Mehr über uns</a>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section class="section partners-section" id="partners">
+        <div class="container">
+          <div class="section-heading reveal">
+            <div class="eyebrow">Partner</div>
+            <h2>Partner & Netzwerk</h2>
+            <p>
+              Starke Communities wachsen nicht isoliert. Partnerschaften schaffen
+              Austausch, Reichweite und gemeinsames Wachstum.
+            </p>
+          </div>
+
+          <article class="partner-card tilt-card reveal">
+            <span class="panel-label">Aktueller Partner</span>
+            <h3>Yugen Naruto RP</h3>
+            <p>
+              Mit Yugen Naruto RP verbindet uns eine Partnerschaft, die auf gegenseitigem
+              Support, Austausch und gemeinsamer Weiterentwicklung basiert.
+            </p>
+          </article>
         </div>
       </section>
     </main>
 
-    <footer>
-      <div class="container footer-inner">
-        <span>© 2026 Medal-DE</span>
-        <span>V3 Konzept · Dark Tech · LED Rot/Blau · Moderne Community Präsenz</span>
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <div class="brand-title">MEDAL-DE</div>
+          <p>
+            Medal-DE – Deutsche Roleplay-Community mit Fokus auf Qualität, Struktur
+            und Eigenentwicklung im Rahmen eines internationalen Netzwerks.
+          </p>
+        </div>
+
+        <div class="footer-links">
+          <div>
+            <span>Navigation</span>
+            <a href="#home">Home</a>
+            <a href="#about">Über uns</a>
+            <a href="#modes">Bereiche</a>
+          </div>
+          <div>
+            <span>Community</span>
+            <a href="#team">Team</a>
+            <a href="#partners">Partner</a>
+            <a href="#join">Join</a>
+          </div>
+          <div>
+            <span>Rechtliches</span>
+            <a href="#">Impressum</a>
+            <a href="#">Datenschutz</a>
+          </div>
+        </div>
       </div>
     </footer>
-  </div>
 
-  <script>
-    const root = document.documentElement;
-    const navbar = document.getElementById("navbar");
-    let lastScrollY = window.scrollY;
-
-    window.addEventListener("mousemove", (event) => {
-      const x = (event.clientX / window.innerWidth) * 100;
-      const y = (event.clientY / window.innerHeight) * 100;
-      root.style.setProperty("--mx", `${x}%`);
-      root.style.setProperty("--my", `${y}%`);
-      mouse.x = event.clientX;
-      mouse.y = event.clientY;
-      mouse.active = true;
-    });
-
-    window.addEventListener("scroll", () => {
-      const current = window.scrollY;
-
-      if (current > 30) {
-        navbar.classList.add("scrolled");
-      } else {
-        navbar.classList.remove("scrolled");
-      }
-
-      if (current > lastScrollY && current > 120) {
-        navbar.classList.add("hidden");
-      } else {
-        navbar.classList.remove("hidden");
-      }
-
-      lastScrollY = current;
-    });
-
-    const revealItems = document.querySelectorAll(".reveal");
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("visible");
-        }
-      });
-    }, { threshold: 0.16 });
-
-    revealItems.forEach((item) => revealObserver.observe(item));
-
-    const particlesCanvas = document.getElementById("particles-canvas");
-    const particlesCtx = particlesCanvas.getContext("2d");
-    const trailCanvas = document.getElementById("trail-canvas");
-    const trailCtx = trailCanvas.getContext("2d");
-
-    let particles = [];
-    let trails = [];
-    let mouse = {
-      x: window.innerWidth * 0.5,
-      y: window.innerHeight * 0.5,
-      active: false
-    };
-
-    function resizeCanvases() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-      [particlesCanvas, trailCanvas].forEach((canvas) => {
-        canvas.width = Math.floor(window.innerWidth * dpr);
-        canvas.height = Math.floor(window.innerHeight * dpr);
-        canvas.style.width = `${window.innerWidth}px`;
-        canvas.style.height = `${window.innerHeight}px`;
-      });
-
-      particlesCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      trailCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      createParticles();
-    }
-
-    function createParticles() {
-      particles = [];
-      const amount = Math.min(70, Math.max(28, Math.floor(window.innerWidth / 22)));
-
-      for (let i = 0; i < amount; i++) {
-        particles.push({
-          x: Math.random() * window.innerWidth,
-          y: Math.random() * window.innerHeight,
-          r: Math.random() * 1.8 + 0.5,
-          vx: (Math.random() - 0.5) * 0.18,
-          vy: (Math.random() - 0.5) * 0.18,
-          a: Math.random() * 0.22 + 0.05,
-          blue: Math.random() > 0.45
-        });
-      }
-    }
-
-    function renderParticles() {
-      particlesCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
-      for (const p of particles) {
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < -10) p.x = window.innerWidth + 10;
-        if (p.x > window.innerWidth + 10) p.x = -10;
-        if (p.y < -10) p.y = window.innerHeight + 10;
-        if (p.y > window.innerHeight + 10) p.y = -10;
-
-        particlesCtx.beginPath();
-        particlesCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        particlesCtx.fillStyle = p.blue
-          ? `rgba(70, 160, 255, ${p.a})`
-          : `rgba(255, 77, 77, ${p.a})`;
-        particlesCtx.fill();
-      }
-    }
-
-    function spawnTrail() {
-      trails.push({
-        x: mouse.x,
-        y: mouse.y,
-        life: 1,
-        size: Math.random() * 26 + 18,
-        redShift: Math.random() * 0.15 + 0.08,
-        blueShift: Math.random() * 0.18 + 0.12
-      });
-
-      if (trails.length > 60) {
-        trails.shift();
-      }
-    }
-
-    function renderTrail() {
-      trailCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
-      for (let i = trails.length - 1; i >= 0; i--) {
-        const t = trails[i];
-        t.life -= 0.025;
-
-        if (t.life <= 0) {
-          trails.splice(i, 1);
-          continue;
-        }
-
-        const alpha = t.life * 0.22;
-        const size = t.size * (1.45 - t.life);
-
-        trailCtx.beginPath();
-        trailCtx.arc(t.x, t.y, size, 0, Math.PI * 2);
-        trailCtx.fillStyle = `rgba(70, 160, 255, ${alpha * t.blueShift})`;
-        trailCtx.fill();
-
-        trailCtx.beginPath();
-        trailCtx.arc(t.x + 4, t.y + 1, size * 0.78, 0, Math.PI * 2);
-        trailCtx.fillStyle = `rgba(255, 77, 77, ${alpha * t.redShift})`;
-        trailCtx.fill();
-      }
-    }
-
-    function animate() {
-      renderParticles();
-
-      if (mouse.active) {
-        spawnTrail();
-      }
-
-      renderTrail();
-      requestAnimationFrame(animate);
-    }
-
-    window.addEventListener("resize", resizeCanvases);
-
-    resizeCanvases();
-    animate();
-  </script>
-</body>
+    <script src="app.js"></script>
+  </body>
 </html>
