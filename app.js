@@ -1,27 +1,24 @@
 const root = document.documentElement;
-const revealElements = document.querySelectorAll('.reveal');
-const tiltCards = document.querySelectorAll('.tilt-card');
-const header = document.querySelector('.site-header');
-const bgOrbs = document.querySelectorAll('.bg-orb');
-const particlesCanvas = document.getElementById('particles-canvas');
-const trailCanvas = document.getElementById('trail-canvas');
-const particlesCtx = particlesCanvas.getContext('2d');
-const trailCtx = trailCanvas.getContext('2d');
+const revealElements = document.querySelectorAll(".reveal");
+const tiltCards = document.querySelectorAll(".tilt-card");
+const header = document.getElementById("site-header");
+const navLinks = document.querySelectorAll(".nav-links a, .footer-links a");
+const bgOrbs = document.querySelectorAll(".bg-orb");
 
 let lastScrollY = window.scrollY;
-let particles = [];
-let trails = [];
+
 const mouse = {
   x: window.innerWidth * 0.5,
-  y: window.innerHeight * 0.5,
+  y: window.innerHeight * 0.4,
   active: false,
 };
 
-window.addEventListener('mousemove', (event) => {
+window.addEventListener("mousemove", (event) => {
   const x = (event.clientX / window.innerWidth) * 100;
   const y = (event.clientY / window.innerHeight) * 100;
-  root.style.setProperty('--mouse-x', `${x}%`);
-  root.style.setProperty('--mouse-y', `${y}%`);
+  root.style.setProperty("--mouse-x", `${x}%`);
+  root.style.setProperty("--mouse-y", `${y}%`);
+
   mouse.x = event.clientX;
   mouse.y = event.clientY;
   mouse.active = true;
@@ -31,7 +28,7 @@ const observer = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
+        entry.target.classList.add("visible");
       }
     });
   },
@@ -42,11 +39,11 @@ const observer = new IntersectionObserver(
 
 revealElements.forEach((element) => observer.observe(element));
 
-const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
 
 if (!isTouchDevice) {
   tiltCards.forEach((card) => {
-    card.addEventListener('mousemove', (event) => {
+    card.addEventListener("mousemove", (event) => {
       const rect = card.getBoundingClientRect();
       const px = (event.clientX - rect.left) / rect.width;
       const py = (event.clientY - rect.top) / rect.height;
@@ -57,71 +54,74 @@ if (!isTouchDevice) {
       card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
     });
 
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+    card.addEventListener("mouseleave", () => {
+      card.style.transform =
+        "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)";
     });
   });
 }
 
-window.addEventListener('scroll', () => {
+window.addEventListener("scroll", () => {
   const currentScrollY = window.scrollY;
-  const scrollDelta = currentScrollY - lastScrollY;
 
-  if (currentScrollY > 30) {
-    header.classList.add('scrolled');
+  if (currentScrollY > 24) {
+    header.classList.add("scrolled");
   } else {
-    header.classList.remove('scrolled');
+    header.classList.remove("scrolled");
   }
 
-  if (scrollDelta > 0 && currentScrollY > 120) {
-    header.classList.add('header-hidden');
+  if (currentScrollY > lastScrollY && currentScrollY > 120) {
+    header.classList.add("hidden");
   } else {
-    header.classList.remove('header-hidden');
+    header.classList.remove("hidden");
   }
 
-  bgOrbs.forEach((orb, i) => {
-    const offset = scrollDelta >= 0 ? 0.05 + i * 0.02 : 0.04 + i * 0.02;
-    orb.style.transform = `translateY(${currentScrollY * offset}px)`;
+  bgOrbs.forEach((orb, index) => {
+    orb.style.transform = `translateY(${currentScrollY * (0.05 + index * 0.02)}px)`;
   });
 
   lastScrollY = currentScrollY;
 });
 
-document.querySelectorAll('.nav-links a').forEach((link) => {
-  link.addEventListener('click', (e) => {
-    e.preventDefault();
-    const target = document.querySelector(link.getAttribute('href'));
+navLinks.forEach((link) => {
+  const href = link.getAttribute("href");
+  if (!href || !href.startsWith("#")) return;
+
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    const target = document.querySelector(href);
     if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
+      target.scrollIntoView({ behavior: "smooth" });
     }
   });
 });
 
-function resizeCanvases() {
+/* =========================
+   PARTICLES
+========================= */
+const particlesCanvas = document.getElementById("particles-canvas");
+const particlesCtx = particlesCanvas.getContext("2d");
+let particles = [];
+
+function resizeParticlesCanvas() {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-  [particlesCanvas, trailCanvas].forEach((canvas) => {
-    canvas.width = Math.floor(window.innerWidth * dpr);
-    canvas.height = Math.floor(window.innerHeight * dpr);
-    canvas.style.width = `${window.innerWidth}px`;
-    canvas.style.height = `${window.innerHeight}px`;
-  });
-
+  particlesCanvas.width = Math.floor(window.innerWidth * dpr);
+  particlesCanvas.height = Math.floor(window.innerHeight * dpr);
+  particlesCanvas.style.width = `${window.innerWidth}px`;
+  particlesCanvas.style.height = `${window.innerHeight}px`;
   particlesCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  trailCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
   createParticles();
 }
 
 function createParticles() {
   particles = [];
-  const amount = Math.min(80, Math.max(26, Math.floor(window.innerWidth / 22)));
+  const amount = Math.min(80, Math.max(28, Math.floor(window.innerWidth / 22)));
 
-  for (let i = 0; i < amount; i += 1) {
+  for (let i = 0; i < amount; i++) {
     particles.push({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
-      r: Math.random() * 1.8 + 0.45,
+      r: Math.random() * 1.7 + 0.5,
       vx: (Math.random() - 0.5) * 0.16,
       vy: (Math.random() - 0.5) * 0.16,
       a: Math.random() * 0.22 + 0.04,
@@ -130,25 +130,41 @@ function createParticles() {
   }
 }
 
-function renderParticles() {
+function drawParticles() {
   particlesCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-  particles.forEach((p) => {
-    p.x += p.vx;
-    p.y += p.vy;
+  for (const particle of particles) {
+    particle.x += particle.vx;
+    particle.y += particle.vy;
 
-    if (p.x < -10) p.x = window.innerWidth + 10;
-    if (p.x > window.innerWidth + 10) p.x = -10;
-    if (p.y < -10) p.y = window.innerHeight + 10;
-    if (p.y > window.innerHeight + 10) p.y = -10;
+    if (particle.x < -10) particle.x = window.innerWidth + 10;
+    if (particle.x > window.innerWidth + 10) particle.x = -10;
+    if (particle.y < -10) particle.y = window.innerHeight + 10;
+    if (particle.y > window.innerHeight + 10) particle.y = -10;
 
     particlesCtx.beginPath();
-    particlesCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    particlesCtx.fillStyle = p.blue
-      ? `rgba(57, 168, 255, ${p.a})`
-      : `rgba(255, 77, 103, ${p.a})`;
+    particlesCtx.arc(particle.x, particle.y, particle.r, 0, Math.PI * 2);
+    particlesCtx.fillStyle = particle.blue
+      ? `rgba(70, 160, 255, ${particle.a})`
+      : `rgba(255, 77, 103, ${particle.a * 0.9})`;
     particlesCtx.fill();
-  });
+  }
+}
+
+/* =========================
+   LED TRAIL
+========================= */
+const trailCanvas = document.getElementById("trail-canvas");
+const trailCtx = trailCanvas.getContext("2d");
+let trails = [];
+
+function resizeTrailCanvas() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  trailCanvas.width = Math.floor(window.innerWidth * dpr);
+  trailCanvas.height = Math.floor(window.innerHeight * dpr);
+  trailCanvas.style.width = `${window.innerWidth}px`;
+  trailCanvas.style.height = `${window.innerHeight}px`;
+  trailCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
 function spawnTrail() {
@@ -156,54 +172,60 @@ function spawnTrail() {
     x: mouse.x,
     y: mouse.y,
     life: 1,
-    size: Math.random() * 24 + 16,
-    redShift: Math.random() * 0.16 + 0.08,
+    size: Math.random() * 24 + 18,
+    redShift: Math.random() * 0.14 + 0.08,
     blueShift: Math.random() * 0.18 + 0.12,
   });
 
-  if (trails.length > 60) {
+  if (trails.length > 65) {
     trails.shift();
   }
 }
 
-function renderTrail() {
+function drawTrail() {
   trailCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-  for (let i = trails.length - 1; i >= 0; i -= 1) {
-    const t = trails[i];
-    t.life -= 0.026;
+  for (let i = trails.length - 1; i >= 0; i--) {
+    const trail = trails[i];
+    trail.life -= 0.026;
 
-    if (t.life <= 0) {
+    if (trail.life <= 0) {
       trails.splice(i, 1);
       continue;
     }
 
-    const alpha = t.life * 0.24;
-    const size = t.size * (1.45 - t.life);
+    const alpha = trail.life * 0.22;
+    const size = trail.size * (1.45 - trail.life);
 
     trailCtx.beginPath();
-    trailCtx.arc(t.x, t.y, size, 0, Math.PI * 2);
-    trailCtx.fillStyle = `rgba(57, 168, 255, ${alpha * t.blueShift})`;
+    trailCtx.arc(trail.x, trail.y, size, 0, Math.PI * 2);
+    trailCtx.fillStyle = `rgba(70, 160, 255, ${alpha * trail.blueShift})`;
     trailCtx.fill();
 
     trailCtx.beginPath();
-    trailCtx.arc(t.x + 4, t.y + 1, size * 0.78, 0, Math.PI * 2);
-    trailCtx.fillStyle = `rgba(255, 77, 103, ${alpha * t.redShift})`;
+    trailCtx.arc(trail.x + 4, trail.y + 1, size * 0.78, 0, Math.PI * 2);
+    trailCtx.fillStyle = `rgba(255, 77, 103, ${alpha * trail.redShift})`;
     trailCtx.fill();
   }
 }
 
 function animate() {
-  renderParticles();
+  drawParticles();
 
-  if (mouse.active && !isTouchDevice) {
+  if (mouse.active) {
     spawnTrail();
   }
 
-  renderTrail();
+  drawTrail();
   requestAnimationFrame(animate);
 }
 
-window.addEventListener('resize', resizeCanvases);
-resizeCanvases();
+function handleResize() {
+  resizeParticlesCanvas();
+  resizeTrailCanvas();
+}
+
+window.addEventListener("resize", handleResize);
+
+handleResize();
 animate();
