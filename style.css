@@ -66,6 +66,7 @@ button {
   opacity: 0.22;
   pointer-events: none;
   z-index: 0;
+  transition: transform 0.2s linear;
 }
 
 .orb-blue {
@@ -118,16 +119,12 @@ main,
   gap: 14px;
 }
 
-.brand-mark {
-  width: 46px;
-  height: 46px;
-  border-radius: 16px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 0 30px rgba(57, 168, 255, 0.14);
-  font-weight: 700;
+.brand-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 14px rgba(57,168,255,0.35));
 }
 
 .brand-title {
@@ -189,6 +186,7 @@ main,
   color: #05070c;
   border-color: rgba(255,255,255,0.5);
   font-weight: 700;
+  box-shadow: 0 0 30px rgba(255,255,255,0.08);
 }
 
 .button-secondary {
@@ -201,7 +199,16 @@ main,
 }
 
 .hero {
+  position: relative;
   padding-top: 80px;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.03), transparent 60%);
 }
 
 .hero-grid,
@@ -350,40 +357,39 @@ main,
   pointer-events: none;
 }
 
-.visual-core {
+.hero-logo-panel {
   min-height: 360px;
   display: flex;
   flex-direction: column;
 }
 
-.core-ring-wrap {
+.hero-logo-wrap {
   flex: 1;
   display: grid;
   place-items: center;
-  position: relative;
   margin-top: 18px;
   border-radius: 24px;
   border: 1px solid var(--border);
-  background: radial-gradient(circle at center, rgba(255,255,255,0.1), transparent 46%);
+  background:
+    radial-gradient(circle at center, rgba(255,255,255,0.08), transparent 48%),
+    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  overflow: hidden;
 }
 
-.core-ring,
-.core-center {
-  position: absolute;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+.hero-main-logo {
+  width: min(320px, 78%);
+  object-fit: contain;
+  filter: drop-shadow(0 0 28px rgba(57,168,255,0.22));
+  animation: floatLogo 5s ease-in-out infinite;
 }
 
-.ring-1 { width: 180px; height: 180px; }
-.ring-2 { width: 130px; height: 130px; border-color: rgba(57,168,255,0.3); }
-.ring-3 { width: 88px; height: 88px; border-color: rgba(255,77,103,0.3); }
-
-.core-center {
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
-  background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(16px);
+@keyframes floatLogo {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .visual-side {
@@ -426,6 +432,7 @@ main,
   overflow: hidden;
   padding: 30px;
   border-radius: 32px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .mode-card::before {
@@ -469,10 +476,21 @@ main,
   margin-top: 26px;
 }
 
+.mode-logo {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 0 14px rgba(255,255,255,0.08));
+}
+
 .feature-card,
 .team-card,
 .partner-card,
-.info-card {
+.info-card,
+.visual-panel,
+.visual-shell,
+.stat-card {
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
@@ -480,12 +498,23 @@ main,
 .team-card:hover,
 .partner-card:hover,
 .info-card:hover,
-.mode-card:hover,
 .visual-panel:hover,
 .visual-shell:hover,
 .stat-card:hover {
   border-color: rgba(255,255,255,0.18);
   box-shadow: 0 0 60px rgba(255,255,255,0.06);
+}
+
+.mode-card:hover {
+  transform: translateY(-8px) scale(1.01);
+}
+
+.mode-card.scp:hover {
+  box-shadow: 0 0 80px rgba(255,77,103,0.18);
+}
+
+.mode-card.cwrp:hover {
+  box-shadow: 0 0 80px rgba(57,168,255,0.18);
 }
 
 .cta-box {
@@ -538,7 +567,7 @@ main,
 .reveal {
   opacity: 0;
   transform: translateY(26px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
+  transition: opacity 1s ease, transform 1s ease;
 }
 
 .reveal.visible {
@@ -626,5 +655,10 @@ main,
 
   .nav-button {
     display: none;
+  }
+
+  .mode-logo {
+    width: 60px;
+    height: 60px;
   }
 }
