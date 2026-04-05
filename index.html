@@ -1,14 +1,26 @@
-﻿<!doctype html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8" />
-    <title>Community</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Community System</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <h1>Meine Community 🚀</h1>
-    <p>Erstes Git + Cloudflare Projekt</p>
 
-    <script src="app.js"></script>
+<div id="login">
+  <h1>🔐 Login</h1>
+  <input id="user" placeholder="Username">
+  <input id="pass" type="password" placeholder="Passwort">
+  <button onclick="login()">Login</button>
+  <p id="error"></p>
+</div>
+
+<div id="app" style="display:none;">
+  <h1>🏠 Dashboard</h1>
+  <p id="welcome"></p>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
