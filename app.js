@@ -70,10 +70,14 @@ window.addEventListener("scroll", () => {
     header.classList.remove("scrolled");
   }
 
+  // Header verstecken beim Runterscrollen
   if (currentScrollY > lastScrollY && currentScrollY > 120) {
     header.classList.add("hidden");
   } else {
-    header.classList.remove("hidden");
+    // Nur wieder anzeigen, wenn man weit genug oben ist
+    if (currentScrollY <= 80) {
+      header.classList.remove("hidden");
+    }
   }
 
   bgOrbs.forEach((orb, index) => {
@@ -85,15 +89,18 @@ window.addEventListener("scroll", () => {
 
 navLinks.forEach((link) => {
   const href = link.getAttribute("href");
-  if (!href || !href.startsWith("#")) return;
+  if (!href) return;
 
-  link.addEventListener("click", (event) => {
-    event.preventDefault();
-    const target = document.querySelector(href);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth" });
-    }
-  });
+  // Nur reine Anchor-Links smooth scrollen
+  if (href.startsWith("#")) {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      const target = document.querySelector(href);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth" });
+      }
+    });
+  }
 });
 
 /* =========================
