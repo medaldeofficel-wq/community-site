@@ -13,6 +13,19 @@ const mouse = {
   active: false,
 };
 
+/* =========================
+   SAFE HEADER FIX
+========================= */
+if (header) {
+  header.style.zIndex = "99999";
+  header.style.pointerEvents = "auto";
+  header.style.transform = window.scrollY <= 80 ? "translateY(0)" : "translateY(-110%)";
+}
+
+document.querySelectorAll(".site-header, .site-header *").forEach((element) => {
+  element.style.pointerEvents = "auto";
+});
+
 window.addEventListener("mousemove", (event) => {
   const x = (event.clientX / window.innerWidth) * 100;
   const y = (event.clientY / window.innerHeight) * 100;
@@ -24,21 +37,29 @@ window.addEventListener("mousemove", (event) => {
   mouse.active = true;
 });
 
-const observer = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-      }
-    });
-  },
-  {
-    threshold: 0.14,
-  }
-);
+/* =========================
+   REVEAL
+========================= */
+if (revealElements.length) {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+        }
+      });
+    },
+    {
+      threshold: 0.14,
+    }
+  );
 
-revealElements.forEach((element) => observer.observe(element));
+  revealElements.forEach((element) => observer.observe(element));
+}
 
+/* =========================
+   CARD TILT
+========================= */
 const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
 
 if (!isTouchDevice) {
@@ -61,22 +82,28 @@ if (!isTouchDevice) {
   });
 }
 
+/* =========================
+   HEADER SCROLL
+   sichtbar NUR oben
+========================= */
 window.addEventListener("scroll", () => {
   const currentScrollY = window.scrollY;
 
-  if (currentScrollY > 24) {
-    header.classList.add("scrolled");
-  } else {
-    header.classList.remove("scrolled");
-  }
+  if (header) {
+    if (currentScrollY > 24) {
+      header.classList.add("scrolled");
+    } else {
+      header.classList.remove("scrolled");
+    }
 
-  // Header verstecken beim Runterscrollen
-  if (currentScrollY > lastScrollY && currentScrollY > 120) {
-    header.classList.add("hidden");
-  } else {
-    // Nur wieder anzeigen, wenn man weit genug oben ist
     if (currentScrollY <= 80) {
       header.classList.remove("hidden");
+      header.style.transform = "translateY(0)";
+      header.style.pointerEvents = "auto";
+    } else {
+      header.classList.add("hidden");
+      header.style.transform = "translateY(-110%)";
+      header.style.pointerEvents = "none";
     }
   }
 
@@ -87,18 +114,21 @@ window.addEventListener("scroll", () => {
   lastScrollY = currentScrollY;
 });
 
+/* =========================
+   NAV LINK FIX
+========================= */
 navLinks.forEach((link) => {
   const href = link.getAttribute("href");
   if (!href) return;
 
-  // Nur reine Anchor-Links smooth scrollen
+  // Nur reine Section-Links auf derselben Seite smooth scrollen
   if (href.startsWith("#")) {
     link.addEventListener("click", (event) => {
-      event.preventDefault();
       const target = document.querySelector(href);
-      if (target) {
-        target.scrollIntoView({ behavior: "smooth" });
-      }
+      if (!target) return;
+
+      event.preventDefault();
+      target.scrollIntoView({ behavior: "smooth" });
     });
   }
 });
@@ -107,10 +137,12 @@ navLinks.forEach((link) => {
    PARTICLES
 ========================= */
 const particlesCanvas = document.getElementById("particles-canvas");
-const particlesCtx = particlesCanvas.getContext("2d");
+const particlesCtx = particlesCanvas ? particlesCanvas.getContext("2d") : null;
 let particles = [];
 
 function resizeParticlesCanvas() {
+  if (!particlesCanvas || !particlesCtx) return;
+
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   particlesCanvas.width = Math.floor(window.innerWidth * dpr);
   particlesCanvas.height = Math.floor(window.innerHeight * dpr);
@@ -138,6 +170,8 @@ function createParticles() {
 }
 
 function drawParticles() {
+  if (!particlesCanvas || !particlesCtx) return;
+
   particlesCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
   for (const particle of particles) {
@@ -162,10 +196,12 @@ function drawParticles() {
    LED TRAIL
 ========================= */
 const trailCanvas = document.getElementById("trail-canvas");
-const trailCtx = trailCanvas.getContext("2d");
+const trailCtx = trailCanvas ? trailCanvas.getContext("2d") : null;
 let trails = [];
 
 function resizeTrailCanvas() {
+  if (!trailCanvas || !trailCtx) return;
+
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   trailCanvas.width = Math.floor(window.innerWidth * dpr);
   trailCanvas.height = Math.floor(window.innerHeight * dpr);
@@ -175,6 +211,8 @@ function resizeTrailCanvas() {
 }
 
 function spawnTrail() {
+  if (!trailCanvas || !trailCtx) return;
+
   trails.push({
     x: mouse.x,
     y: mouse.y,
@@ -190,6 +228,8 @@ function spawnTrail() {
 }
 
 function drawTrail() {
+  if (!trailCanvas || !trailCtx) return;
+
   trailCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
   for (let i = trails.length - 1; i >= 0; i--) {
@@ -217,13 +257,18 @@ function drawTrail() {
 }
 
 function animate() {
-  drawParticles();
+  if (particlesCanvas && particlesCtx) {
+    drawParticles();
+  }
 
-  if (mouse.active) {
+  if (mouse.active && trailCanvas && trailCtx) {
     spawnTrail();
   }
 
-  drawTrail();
+  if (trailCanvas && trailCtx) {
+    drawTrail();
+  }
+
   requestAnimationFrame(animate);
 }
 
