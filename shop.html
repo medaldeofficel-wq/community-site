@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medal-DE | Shop</title>
+    <meta
+      name="description"
+      content="Der Medal-DE Shop befindet sich aktuell im Aufbau."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="shop-page">
+    <canvas id="particles-canvas"></canvas>
+    <canvas id="trail-canvas"></canvas>
+
+    <div class="mouse-glow"></div>
+    <div class="bg-grid"></div>
+    <div class="bg-orb orb-blue"></div>
+    <div class="bg-orb orb-red"></div>
+
+    <header class="site-header" id="site-header">
+      <div class="container nav">
+        <a href="index.html" class="brand">
+          <img src="Medal.png" class="brand-logo" alt="Medal-DE Logo" />
+          <div>
+            <div class="brand-title">MEDAL-DE</div>
+            <div class="brand-subtitle">Community Platform</div>
+          </div>
+        </a>
+
+        <nav class="nav-links">
+          <a href="index.html">Hauptseite</a>
+          <a href="shop.html" class="active">Shop</a>
+          <a href="team.html">Team</a>
+        </nav>
+
+        <a
+          class="nav-button"
+          href="https://discord.com/invite/medal-de"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Discord beitreten
+        </a>
+      </div>
+    </header>
+
+    <main>
+      <section class="shop-hero section">
+        <div class="container shop-stage">
+          <img src="Medal.png" alt="Medal Logo" class="shop-bg-logo" />
+
+          <div class="shop-orbit orbit-one"></div>
+          <div class="shop-orbit orbit-two"></div>
+          <div class="shop-orbit orbit-three"></div>
+
+          <div class="shop-coming tilt-card" id="shop-sphere">
+            <span class="panel-label">MEDAL-DE SHOP</span>
+            <h1>Kommt bald</h1>
+            <p>
+              Unser Shop befindet sich aktuell im Aufbau. Bald findest du hier
+              weitere Inhalte, Designs und Community-Features.
+            </p>
+
+            <div class="hero-actions shop-actions">
+              <a class="button button-primary" href="index.html">Zur Hauptseite</a>
+              <a class="button button-secondary" href="team.html">Zum Team</a>
+            </div>
+          </div>
+
+          <div class="shop-particle shop-particle-1"></div>
+          <div class="shop-particle shop-particle-2"></div>
+          <div class="shop-particle shop-particle-3"></div>
+          <div class="shop-particle shop-particle-4"></div>
+          <div class="shop-particle shop-particle-5"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <div class="brand footer-brand">
+            <img src="Medal.png" class="brand-logo" alt="Medal-DE Logo" />
+            <div>
+              <div class="brand-title">MEDAL-DE</div>
+              <div class="brand-subtitle">Community Platform</div>
+            </div>
+          </div>
+          <p class="footer-text">
+            Deutscher Ableger der Medal-Community mit Fokus auf modernes Roleplay,
+            Struktur und hochwertige Entwicklung.
+          </p>
+        </div>
+
+        <div class="footer-links">
+          <span>Navigation</span>
+          <a href="index.html">Hauptseite</a>
+          <a href="shop.html">Shop</a>
+          <a href="team.html">Team</a>
+        </div>
+
+        <div class="footer-links">
+          <span>Community</span>
+          <a href="https://discord.com/invite/medal-de" target="_blank" rel="noreferrer">
+            Discord
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
