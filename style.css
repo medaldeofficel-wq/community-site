@@ -254,6 +254,19 @@ main,
   color: var(--text);
 }
 
+.nav-links a,
+.nav-button,
+.button {
+  position: relative;
+  z-index: 5;
+}
+
+.team-preview-action {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 26px;
+}
+
 .section {
   padding: 110px 0;
 }
