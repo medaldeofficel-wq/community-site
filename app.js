@@ -4,6 +4,7 @@ const tiltCards = document.querySelectorAll(".tilt-card");
 const header = document.getElementById("site-header");
 const navLinks = document.querySelectorAll(".nav-links a, .footer-links a");
 const bgOrbs = document.querySelectorAll(".bg-orb");
+const shopSphere = document.getElementById("shop-sphere");
 
 const mouse = {
   x: window.innerWidth * 0.5,
@@ -21,6 +22,19 @@ window.addEventListener("mousemove", (event) => {
   mouse.x = event.clientX;
   mouse.y = event.clientY;
   mouse.active = true;
+
+  if (shopSphere) {
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const moveX = (event.clientX - centerX) / 55;
+    const moveY = (event.clientY - centerY) / 55;
+
+    shopSphere.style.transform = `
+      translate3d(${moveX}px, ${moveY}px, 0)
+      rotateX(${(-moveY) * 0.2}deg)
+      rotateY(${moveX * 0.2}deg)
+    `;
+  }
 });
 
 /* =========================
@@ -50,6 +64,8 @@ const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
 
 if (!isTouchDevice) {
   tiltCards.forEach((card) => {
+    if (card.id === "shop-sphere") return;
+
     card.addEventListener("mousemove", (event) => {
       const rect = card.getBoundingClientRect();
       const px = (event.clientX - rect.left) / rect.width;
